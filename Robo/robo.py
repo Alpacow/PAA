@@ -5,27 +5,37 @@ class Graph:
         self.r2 = coord2  # coordenadas do robo 2
         self.dist = dist  # distancia minima entre os robos 
 
-    def findPaths(self, r, r2, d):
+    def findPaths(self, r, d):
         path = [] # array p guardar caminhos
         visited = {}
+        robotTurn = 0
         for no in self.graph:
             visited[no] = False
-        self.findPathsAux(r, r2, d, visited, path) 
+        self.findPathsAux(r, d, visited, path, robotTurn)
         
-    def findPathsAux(self, r, r2, d, visited, path):
-        visited[r] = True
-        path.append(r)
-  
+    def findPathsAux(self, r, d, visited, path, robotTurn):
+        print("VEZ: ", robotTurn)
+        aux = robotTurn
+        if robotTurn == 0:
+            robotTurn += 1
+        elif robotTurn == 1:
+            robotTurn -= 1
+        visited[r[aux]] = True
+        path.append(r[aux])
         # se ja chegou no destino printa
-        if r == d and self.isSecureDistance(r, r2):
-            print(path, "\n")
+        if r[aux] == d[aux]:# and self.isSecureDistance(r):
+            print("Caminho encontrado: ", path, "\n")
         else:
-            for i in self.graph[r]:
+            for i in self.graph[r[aux]]:
                 if visited[i] == False:
-                    self.findPathsAux(i, r2, d, visited, path)             
+                    newR = (i, r[1])
+                    if aux == 1:
+                        newR = (r[0], i)
+                    print(newR)
+                    self.findPathsAux(newR, d, visited, path, robotTurn)
         # Deleta nodo atual de path e marca como nodo visitado
         path.pop() 
-        visited[r] = False
+        visited[r[aux]] = False
 
     def pointDistance(self, r1, r2):
         return r2 - r1 if r2 > r1 else r1 - r2
@@ -48,17 +58,14 @@ class Graph:
                 if j < x - 1 and j >= 0:
                     self.graph[(i, j)].append((i, j + 1))
                 # Print Grid
-                if (i, j) == self.r1 or (i, j) == self.r2:
-                    print("Robot", self.graph[(i, j)])
-                else:
-                    print((i, j), self.graph[(i, j)])
+                #if (i, j) == self.r1 or (i, j) == self.r2:
+                 #   print("Robot", self.graph[(i, j)])
+                #else:
+                 #   print((i, j), self.graph[(i, j)])
             
 
 # Testes
 g = Graph((0, 0), (2, 2), 1) # origens
 g.initGrid(3)
 print("ROBO 1")
-g.findPaths(g.r1, g.r2, (0, 1)) # possibilidades robo 1
-#print("ROBO 2")
-#g.findPaths(g.r2, (2, 0)) # possibilidades robo 2
-#g.findPaths(g.r1, (0, 1), g.r2,  (2, 0)) # possibilidades robo 2
+g.findPaths((g.r1, g.r2), ((0, 2), (2, 1))) # possibilidades
